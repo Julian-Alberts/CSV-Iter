@@ -37,6 +37,10 @@ where
     pub fn new_without_header(data: R, field_separator: char) -> Self {
         CSVIter::new_internal(data, NoHeader, field_separator)
     }
+
+    pub fn width() {
+
+    }
 }
 
 impl<R> CSVIter<R, WithHeader>
@@ -44,13 +48,18 @@ where
     R: BufRead,
 {
     pub fn new_with_header(mut data: R, field_separator: char) -> std::io::Result<Self> {
-        let header = if let Some(header) = Row::new(&mut data, Rc::new(NoHeader), field_separator)?
+        let header = Row::new(&mut data, Rc::new(NoHeader), field_separator)?;
+        let header = if let Some(header_row) = header
         {
-            WithHeader::new(header)
+            WithHeader::new(header_row)
         } else {
             WithHeader::default()
         };
         Ok(CSVIter::new_internal(data, header, field_separator))
+    }
+
+    pub fn width(&self) -> usize {
+        self.header.width()
     }
 }
 

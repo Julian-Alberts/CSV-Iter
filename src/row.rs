@@ -30,6 +30,10 @@ impl<H> Row<H> {
     pub fn iter(&self) -> RowIter {
         RowIter { remaining: &self.data }
     }
+
+    pub fn width(&self) -> usize {
+        self.data.len()
+    }
 }
 
 impl Row<WithHeader> {

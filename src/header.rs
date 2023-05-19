@@ -34,6 +34,10 @@ impl WithHeader {
         let header = self.header.keys();
         HeaderIter { header }
     }
+
+    pub fn width(&self) -> usize {
+        self.header.len()
+    }
 }
 
 impl <'a> Iterator for HeaderIter<'a> {
@@ -67,5 +71,39 @@ mod tests {
                 ]),
             }
         );
+    }
+
+    #[test]
+    fn header_iter() {
+        let header = WithHeader {
+            header: HashMap::from_iter([
+                "a".to_string(),
+                "b".to_string(),
+                "c".to_string()
+            ].into_iter().enumerate().map(|(a,b)|(b,a)))
+        };
+
+        let mut expected_keys = vec!["a","b","c"];
+
+        for key in header.iter() {
+            if expected_keys.contains(&key) {
+                expected_keys.retain(|ek| *ek != key)
+            } else {
+                panic!("found unexpected key: \"{}\"", key)
+            }
+        }
+        assert!(expected_keys.is_empty())
+    }
+
+    #[test]
+    fn header_width() {
+        let header = WithHeader {
+            header: HashMap::from_iter([
+                "a".to_string(),
+                "b".to_string(),
+                "c".to_string()
+            ].into_iter().enumerate().map(|(a,b)|(b,a)))
+        };
+        assert_eq!(header.width(), 3)
     }
 }
