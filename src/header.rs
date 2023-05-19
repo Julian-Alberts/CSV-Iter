@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, hash_map::Keys};
 
 use crate::Row;
 
@@ -8,6 +8,10 @@ pub struct NoHeader;
 #[derive(Debug, PartialEq, Eq, Default)]
 pub struct WithHeader {
     header: HashMap<String, usize>,
+}
+
+pub struct HeaderIter<'a> {
+    header: Keys<'a, String, usize>
 }
 
 impl WithHeader {
@@ -24,6 +28,18 @@ impl WithHeader {
 
     pub fn get_index(&self, key: &str) -> Option<usize> {
         self.header.get(key).copied()
+    }
+
+    pub fn iter(&self) -> HeaderIter {
+        let header = self.header.keys();
+        HeaderIter { header }
+    }
+}
+
+impl <'a> Iterator for HeaderIter<'a> {
+    type Item = &'a str;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.header.next().map(String::as_str)
     }
 }
 
