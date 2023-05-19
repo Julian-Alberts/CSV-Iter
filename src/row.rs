@@ -7,6 +7,10 @@ pub struct Row<H = NoHeader> {
     header: Rc<H>,
 }
 
+pub struct RowIter<'a> {
+    remaining: &'a [String]
+}
+
 impl<H> Row<H> {
     pub(super) fn new(
         data: &mut impl BufRead,
@@ -18,18 +22,32 @@ impl<H> Row<H> {
         };
         Ok(Some(Self { data, header }))
     }
-}
 
-impl Row<NoHeader> {
     pub fn get(&self, index: usize) -> Option<&str> {
         self.data.get(index).as_ref().map(|s| s.as_str())
+    }
+
+    pub fn iter(&self) -> RowIter {
+        RowIter { remaining: &self.data }
     }
 }
 
 impl Row<WithHeader> {
-    pub fn get(&self, key: &str) -> Option<&str> {
+    pub fn get_by_key(&self, key: &str) -> Option<&str> {
         let index = self.header.get_index(key)?;
         self.data.get(index).as_ref().map(|s| s.as_str())
+    }
+}
+
+impl <'a> Iterator for RowIter<'a> {
+    type Item = &'a str;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.remaining.is_empty() {
+            return None;
+        }
+        let item = &self.remaining[0];
+        self.remaining = &self.remaining[1..];
+        Some(item)
     }
 }
 

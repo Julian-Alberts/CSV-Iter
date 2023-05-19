@@ -97,17 +97,17 @@ mod tests {
         assert_eq!(iter.data, data[6..].as_bytes());
         let row = iter.next();
         let row = row.unwrap().unwrap();
-        assert_eq!(row.get("a"), Some("1"));
-        assert_eq!(row.get("b"), Some("2"));
-        assert_eq!(row.get("c"), Some("3"));
+        assert_eq!(row.get_by_key("a"), Some("1"));
+        assert_eq!(row.get_by_key("b"), Some("2"));
+        assert_eq!(row.get_by_key("c"), Some("3"));
         let row = iter.next().unwrap().unwrap();
-        assert_eq!(row.get("a"), Some("4"));
-        assert_eq!(row.get("b"), Some("5"));
-        assert_eq!(row.get("c"), Some("6"));
+        assert_eq!(row.get_by_key("a"), Some("4"));
+        assert_eq!(row.get_by_key("b"), Some("5"));
+        assert_eq!(row.get_by_key("c"), Some("6"));
         let row = iter.next().unwrap().unwrap();
-        assert_eq!(row.get("a"), Some("7"));
-        assert_eq!(row.get("b"), Some("8"));
-        assert_eq!(row.get("c"), Some("9"));
+        assert_eq!(row.get_by_key("a"), Some("7"));
+        assert_eq!(row.get_by_key("b"), Some("8"));
+        assert_eq!(row.get_by_key("c"), Some("9"));
         assert!(iter.next().is_none());
     }
 }
