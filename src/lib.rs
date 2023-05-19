@@ -37,10 +37,6 @@ where
     pub fn new_without_header(data: R, field_separator: char) -> Self {
         CSVIter::new_internal(data, NoHeader, field_separator)
     }
-
-    pub fn width() {
-
-    }
 }
 
 impl<R> CSVIter<R, WithHeader>
@@ -118,5 +114,26 @@ mod tests {
         assert_eq!(row.get_by_key("b"), Some("8"));
         assert_eq!(row.get_by_key("c"), Some("9"));
         assert!(iter.next().is_none());
+        assert_eq!(iter.width(), 3)
+    }
+
+    #[test]
+    fn create_iter_with_header_default() {
+        let mut iter = CSVIter::new_with_header("".as_bytes(), ',').unwrap();
+        assert_eq!(iter.width(), 0);
+        assert!(iter.next().is_none());
+    }
+
+    #[test]
+    fn invalid_csv() {
+        let data = b"test,invalid\"value\nvalid,invalid\"\"value2";
+        let csv = CSVIter::new_without_header(&data[..], ',');
+        
+        for entry in csv {
+            let Err(e) = entry else {
+                panic!("Expected error");
+            };
+            assert_eq!(e.kind(), std::io::ErrorKind::InvalidData);
+        }
     }
 }

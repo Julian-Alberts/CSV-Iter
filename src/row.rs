@@ -242,4 +242,18 @@ mod tests {
             ])
         );
     }
+
+    #[test]
+    fn row_to_iter() {
+        let row = Row {
+            data: vec!["a".to_owned(), "b".to_owned(), "c".to_owned()],
+            header: Rc::new(NoHeader)
+        };
+        assert_eq!(row.width(), 3);
+        let mut iter = row.iter();
+        assert_eq!(iter.next(), Some("a"));
+        assert_eq!(iter.next(), Some("b"));
+        assert_eq!(iter.next(), Some("c"));
+        assert!(iter.next().is_none());
+    }
 }
