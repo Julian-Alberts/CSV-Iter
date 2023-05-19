@@ -15,9 +15,9 @@ impl<H> Row<H> {
     pub(super) fn new(
         data: &mut impl BufRead,
         header: Rc<H>,
-        field_seperator: char,
+        field_separator: char,
     ) -> std::io::Result<Option<Self>> {
-        let Some(data) = parse_row(data, field_seperator)? else {
+        let Some(data) = parse_row(data, field_separator)? else {
             return Ok(None);
         };
         Ok(Some(Self { data, header }))
@@ -53,7 +53,7 @@ impl <'a> Iterator for RowIter<'a> {
 
 fn parse_row(
     data: &mut impl BufRead,
-    field_seperator: char,
+    field_separator: char,
 ) -> std::io::Result<Option<Vec<String>>> {
     let mut values = Vec::new();
     let mut buf = String::new();
@@ -66,7 +66,7 @@ fn parse_row(
     let mut is_masked_active = false;
     let mut is_first_char = true;
     let mut value_buf = String::with_capacity(512);
-    let mut last_was_seperator = false;
+    let mut last_was_separator = false;
 
     while let Some(c) = chars.next() {
         match (c, value_is_masked, is_first_char, is_masked_active) {
@@ -100,7 +100,7 @@ fn parse_row(
                 data.read_line(&mut buf)?;
                 chars = buf.chars();
             }
-            (c, _, _, false) if c == field_seperator => {
+            (c, _, _, false) if c == field_separator => {
                 let mut value = value_buf.clone();
                 value.shrink_to_fit();
                 values.push(value);
@@ -109,7 +109,7 @@ fn parse_row(
                 is_first_char = true;
                 value_is_masked = false;
                 is_masked_active = false;
-                last_was_seperator = true;
+                last_was_separator = true;
                 continue;
             }
             (c, _, _, _) => {
@@ -117,10 +117,10 @@ fn parse_row(
             }
         }
         is_first_char = false;
-        last_was_seperator = false;
+        last_was_separator = false;
     }
 
-    if !value_buf.is_empty() || last_was_seperator {
+    if !value_buf.is_empty() || last_was_separator {
         values.push(value_buf);
     }
 

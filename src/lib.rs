@@ -14,18 +14,18 @@ where
 {
     header: Rc<H>,
     data: R,
-    seperator: char,
+    separator: char,
 }
 
 impl<R, H> CSVIter<R, H>
 where
     R: Read,
 {
-    fn new_internal(data: R, header: H, seperator: char) -> Self {
+    fn new_internal(data: R, header: H, separator: char) -> Self {
         CSVIter {
             header: Rc::new(header),
             data,
-            seperator,
+            separator,
         }
     }
 }
@@ -34,8 +34,8 @@ impl<R> CSVIter<R, NoHeader>
 where
     R: Read,
 {
-    pub fn new_without_header(data: R, field_seperator: char) -> Self {
-        CSVIter::new_internal(data, NoHeader, field_seperator)
+    pub fn new_without_header(data: R, field_separator: char) -> Self {
+        CSVIter::new_internal(data, NoHeader, field_separator)
     }
 }
 
@@ -43,14 +43,14 @@ impl<R> CSVIter<R, WithHeader>
 where
     R: BufRead,
 {
-    pub fn new_with_header(mut data: R, field_seperator: char) -> std::io::Result<Self> {
-        let header = if let Some(header) = Row::new(&mut data, Rc::new(NoHeader), field_seperator)?
+    pub fn new_with_header(mut data: R, field_separator: char) -> std::io::Result<Self> {
+        let header = if let Some(header) = Row::new(&mut data, Rc::new(NoHeader), field_separator)?
         {
             WithHeader::new(header)
         } else {
             WithHeader::default()
         };
-        Ok(CSVIter::new_internal(data, header, field_seperator))
+        Ok(CSVIter::new_internal(data, header, field_separator))
     }
 }
 
@@ -61,7 +61,7 @@ where
     type Item = std::io::Result<Row<H>>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        Row::new(&mut self.data, self.header.clone(), self.seperator).transpose()
+        Row::new(&mut self.data, self.header.clone(), self.separator).transpose()
     }
 }
 
